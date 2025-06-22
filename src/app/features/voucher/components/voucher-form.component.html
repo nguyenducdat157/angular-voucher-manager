@@ -1,0 +1,68 @@
+<form #formDirective="ngForm" [formGroup]="form" (ngSubmit)="onSubmit()" class="voucher-form">
+  <mat-form-field appearance="fill">
+    <mat-label>Code</mat-label>
+    <input
+      matInput
+      formControlName="code"
+      required
+      placeholder="Enter voucher code"
+    />
+    <mat-error *ngIf="form.get('code')?.hasError('required')">
+      Code is required
+    </mat-error>
+    <mat-error *ngIf="form.get('code')?.hasError('minlength')">
+      Code must be at least 3 characters
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Description</mat-label>
+    <textarea
+      matInput
+      formControlName="description"
+      placeholder="Enter voucher description (optional)"
+      rows="3"
+    ></textarea>
+    <mat-error *ngIf="form.get('description')?.hasError('maxlength')">
+      Description cannot exceed 200 characters
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Expiry Date</mat-label>
+    <input
+      matInput
+      [matDatepicker]="picker"
+      formControlName="expiryDate"
+      required
+      placeholder="Choose expiry date"
+    />
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+    <mat-error *ngIf="form.get('expiryDate')?.hasError('required')">
+      Expiry date is required
+    </mat-error>
+    <mat-error *ngIf="form.get('expiryDate')?.hasError('pastDate')">
+      Expiry date cannot be in the past
+    </mat-error>
+  </mat-form-field>
+
+  <div class="form-actions">
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      [disabled]="form.invalid || form.pristine || isSubmitting"
+    >
+      {{ voucherToEdit ? 'Update Voucher' : 'Create Voucher' }}
+    </button>
+    <button
+      mat-button
+      type="button"
+      (click)="onReset()"
+      [disabled]="isSubmitting"
+    >
+      Cancel
+    </button>
+  </div>
+</form>

@@ -1,0 +1,71 @@
+<div class="container">
+  <h1>Voucher Manager</h1>
+
+  <app-voucher-form
+    [voucherToEdit]="selectedVoucher"
+    (cancel)="onCancel()"
+    (save)="onSaveVoucher($event)"
+  ></app-voucher-form>
+
+  <mat-divider></mat-divider>
+
+  <div class="filter-bar">
+    <h3>Filter Vouchers</h3>
+    <mat-button-toggle-group
+      name="statusFilter"
+      [value]="selectedStatus"
+      (change)="onFilterChange($event.value)"
+      appearance="legacy">
+      <mat-button-toggle value="All">All</mat-button-toggle>
+      <mat-button-toggle value="Available">Available</mat-button-toggle>
+      <mat-button-toggle value="Used">Used</mat-button-toggle>
+      <mat-button-toggle value="Expired">Expired</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  <div class="voucher-table-wrapper mat-elevation-z2">
+    <table mat-table [dataSource]="vouchers$ | async" class="mat-table">
+
+      <!-- Code Column -->
+      <ng-container matColumnDef="code">
+        <th mat-header-cell *matHeaderCellDef> Code </th>
+        <td mat-cell *matCellDef="let voucher"> {{ voucher.code }} </td>
+      </ng-container>
+
+      <!-- Description Column -->
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef> Description </th>
+        <td mat-cell *matCellDef="let voucher"> {{ voucher.description }} </td>
+      </ng-container>
+
+      <!-- Expiry Date Column -->
+      <ng-container matColumnDef="expiryDate">
+        <th mat-header-cell *matHeaderCellDef> Expiry </th>
+        <td mat-cell *matCellDef="let voucher">
+          {{ voucher.expiryDate | date: 'shortDate' }}
+        </td>
+      </ng-container>
+
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef> Status </th>
+        <td mat-cell *matCellDef="let voucher"> {{ voucher.status }} </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let voucher">
+          <button mat-button color="primary" (click)="editVoucher(voucher)">Edit</button>
+          <button mat-button color="warn" (click)="deleteVoucher(voucher.id)">Delete</button>
+          <button mat-button *ngIf="voucher.status === 'Available'" (click)="markAsUsed(voucher.id)">
+            Mark as Used
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+</div>

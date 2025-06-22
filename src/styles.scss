@@ -1,0 +1,122 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Angular Material CSS */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+/* Global styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #f5f5f5;
+}
+
+/* Container styles */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header styles */
+h1 {
+  color: #3f51b5;
+  margin-bottom: 30px;
+  font-weight: 300;
+  text-align: center;
+}
+
+h3 {
+  color: #333;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+/* Form styles */
+.voucher-form {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.voucher-form mat-form-field {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+/* Table styles */
+.voucher-table-wrapper {
+  margin-top: 20px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.mat-table {
+  width: 100%;
+}
+
+.mat-header-cell {
+  background-color: #f5f5f5;
+  font-weight: 500;
+  color: #333;
+}
+
+.mat-row:hover {
+  background-color: #f8f9fa;
+}
+
+/* Filter bar styles */
+.filter-bar {
+  margin: 20px 0;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Button styles */
+.mat-button {
+  margin-right: 8px;
+}
+
+/* Divider styles */
+mat-divider {
+  margin: 20px 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+
+  .voucher-form {
+    margin: 10px;
+    padding: 16px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+}
