@@ -4,28 +4,28 @@ import * as VoucherActions from './voucher.actions';
 
 export interface VoucherState {
   vouchers: Voucher[];
+  loading: boolean;
+  error: string | null;
+  success: string | null;
 }
 
 const initialState: VoucherState = {
-  vouchers: []
+  vouchers: [],
+  loading: false,
+  error: null,
+  success: null
 };
 
 const _voucherReducer = createReducer(
   initialState,
-  on(VoucherActions.loadVouchersSuccess, (state, { vouchers }) => ({ ...state, vouchers })),
-  on(VoucherActions.addVoucher, (state, { voucher }) => ({ ...state, vouchers: [...state.vouchers, voucher] })),
-  on(VoucherActions.updateVoucher, (state, { voucher }) => ({
-    ...state,
-    vouchers: state.vouchers.map(v => v.id === voucher.id ? voucher : v)
-  })),
-  on(VoucherActions.deleteVoucher, (state, { id }) => ({
-    ...state,
-    vouchers: state.vouchers.filter(v => v.id !== id)
-  })),
-  on(VoucherActions.markAsUsed, (state, { id }) => ({
-    ...state,
-    vouchers: state.vouchers.map(v => v.id === id ? { ...v, status: 'Used' } : v)
-  })),
+  on(VoucherActions.setLoading, (state, { loading }) => ({ ...state, loading })),
+  on(VoucherActions.setError, (state, { error }) => ({ ...state, error })),
+  on(VoucherActions.setSuccess, (state, { message }) => ({ ...state, success: message })),
+  on(VoucherActions.loadVouchersSuccess, (state, { vouchers }) => ({ ...state, vouchers, loading: false, error: null })),
+  on(VoucherActions.addVoucher, (state) => ({ ...state, loading: true, error: null })),
+  on(VoucherActions.updateVoucher, (state) => ({ ...state, loading: true, error: null })),
+  on(VoucherActions.deleteVoucher, (state) => ({ ...state, loading: true, error: null })),
+  on(VoucherActions.markAsUsed, (state) => ({ ...state, loading: true, error: null })),
   on(VoucherActions.checkExpired, (state) => {
     const now = new Date();
     return {

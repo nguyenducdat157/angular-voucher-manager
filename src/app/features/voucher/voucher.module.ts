@@ -11,6 +11,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 // src/app/features/voucher/voucher.module.ts
 @NgModule({
@@ -25,6 +26,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
     MatNativeDateModule,
     MatDividerModule,
     MatButtonToggleModule,
+    MatProgressSpinnerModule,
   ],
   declarations: [
     VoucherPageComponent,

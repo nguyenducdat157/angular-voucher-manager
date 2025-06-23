@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Voucher } from 'src/app/features/voucher/voucher.model';
 import { VoucherPageService } from './voucher-page.service';
+import { Store } from '@ngrx/store';
+import { selectLoading, selectError, selectSuccess } from 'src/app/store/voucher/voucher.selectors';
 
 @Component({
   selector: 'app-voucher-page',
@@ -10,6 +12,9 @@ import { VoucherPageService } from './voucher-page.service';
 })
 export class VoucherPageComponent implements OnInit {
   vouchers$: Observable<Voucher[]>;
+  loading$: Observable<boolean>;
+  error$: Observable<string | null>;
+  success$: Observable<string | null>;
   displayedColumns: string[] = ['code', 'description', 'expiryDate', 'status', 'actions'];
   get selectedStatus() {
     return this.voucherPageService.selectedStatus;
@@ -18,7 +23,11 @@ export class VoucherPageComponent implements OnInit {
     return this.voucherPageService.selectedVoucher;
   }
 
-  constructor(public voucherPageService: VoucherPageService) {}
+  constructor(public voucherPageService: VoucherPageService, private store: Store) {
+    this.loading$ = this.store.select(selectLoading);
+    this.error$ = this.store.select(selectError);
+    this.success$ = this.store.select(selectSuccess);
+  }
 
   ngOnInit(): void {
     this.voucherPageService.loadVouchers();

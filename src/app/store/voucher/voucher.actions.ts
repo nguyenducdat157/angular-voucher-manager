@@ -8,3 +8,7 @@ export const updateVoucher = createAction('[Voucher] Update', props<{ voucher: V
 export const deleteVoucher = createAction('[Voucher] Delete', props<{ id: string }>());
 export const markAsUsed = createAction('[Voucher] Mark As Used', props<{ id: string }>());
 export const checkExpired = createAction('[Voucher] Check Expired');
+
+export const setLoading = createAction('[Voucher] Set Loading', props<{ loading: boolean }>());
+export const setError = createAction('[Voucher] Set Error', props<{ error: string | null }>());
+export const setSuccess = createAction('[Voucher] Set Success', props<{ message: string | null }>());

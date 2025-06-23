@@ -1,51 +1,103 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { map, tap, withLatestFrom } from 'rxjs/operators';
+import { map, mergeMap, catchError, switchMap, tap } from 'rxjs/operators';
 import * as VoucherActions from './voucher.actions';
-import { Store } from '@ngrx/store';
-import { VoucherState } from './voucher.reducer';
-import { selectAllVouchers } from './voucher.selectors';
 import { VoucherService } from 'src/app/features/voucher/voucher.service';
+import { Store } from '@ngrx/store';
 
 @Injectable()
 export class VoucherEffects {
   constructor(
     private actions$: Actions,
     private voucherService: VoucherService,
-    private store: Store<VoucherState>
+    private store: Store
   ) {}
 
-  // Load vouchers từ localStorage
   loadVouchers$ = createEffect(() =>
     this.actions$.pipe(
       ofType(VoucherActions.loadVouchers),
-      map(() => {
-        const vouchers = this.voucherService.getAll();
-        return VoucherActions.loadVouchersSuccess({ vouchers });
-      })
+      switchMap(() => [
+        VoucherActions.setLoading({ loading: true })
+      ])
     )
   );
 
-  // Lưu lại danh sách mỗi khi thay đổi
-  persistVouchers$ = createEffect(() =>
+  loadVouchersApi$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(
-        VoucherActions.addVoucher,
-        VoucherActions.updateVoucher,
-        VoucherActions.deleteVoucher,
-        VoucherActions.markAsUsed,
-        VoucherActions.checkExpired
-      ),
-      withLatestFrom(this.store.select(selectAllVouchers)),
-      tap(([action, vouchers]) => {
-        this.voucherService.saveAll(vouchers);
-      })
-    ),
-    { dispatch: false } // không trả ra action mới
+      ofType(VoucherActions.setLoading),
+      switchMap(() =>
+        this.voucherService.getAll().pipe(
+          map(vouchers => VoucherActions.loadVouchersSuccess({ vouchers })),
+          catchError(error => of(
+            VoucherActions.setError({ error: 'Lỗi tải danh sách voucher!' }),
+            VoucherActions.setLoading({ loading: false })
+          ))
+        )
+      )
+    )
   );
 
-  // Thêm mới: gọi checkExpired sau khi load thành công
+  addVoucher$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(VoucherActions.addVoucher),
+      tap(() => this.store.dispatch(VoucherActions.setLoading({ loading: true }))),
+      mergeMap(({ voucher }) =>
+        this.voucherService.addVoucher(voucher).pipe(
+          mergeMap(() => [
+            VoucherActions.setSuccess({ message: 'Thêm voucher thành công!' }),
+            VoucherActions.setLoading({ loading: false }),
+            VoucherActions.loadVouchers()
+          ]),
+          catchError(() => of(
+            VoucherActions.setError({ error: 'Lỗi thêm voucher!' }),
+            VoucherActions.setLoading({ loading: false })
+          ))
+        )
+      )
+    )
+  );
+
+  updateVoucher$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(VoucherActions.updateVoucher),
+      tap(() => this.store.dispatch(VoucherActions.setLoading({ loading: true }))),
+      mergeMap(({ voucher }) =>
+        this.voucherService.updateVoucher(voucher).pipe(
+          mergeMap(() => [
+            VoucherActions.setSuccess({ message: 'Cập nhật voucher thành công!' }),
+            VoucherActions.setLoading({ loading: false }),
+            VoucherActions.loadVouchers()
+          ]),
+          catchError(() => of(
+            VoucherActions.setError({ error: 'Lỗi cập nhật voucher!' }),
+            VoucherActions.setLoading({ loading: false })
+          ))
+        )
+      )
+    )
+  );
+
+  deleteVoucher$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(VoucherActions.deleteVoucher),
+      tap(() => this.store.dispatch(VoucherActions.setLoading({ loading: true }))),
+      mergeMap(({ id }) =>
+        this.voucherService.deleteVoucher(id).pipe(
+          mergeMap(() => [
+            VoucherActions.setSuccess({ message: 'Xóa voucher thành công!' }),
+            VoucherActions.setLoading({ loading: false }),
+            VoucherActions.loadVouchers()
+          ]),
+          catchError(() => of(
+            VoucherActions.setError({ error: 'Lỗi xóa voucher!' }),
+            VoucherActions.setLoading({ loading: false })
+          ))
+        )
+      )
+    )
+  );
+
   checkExpired$ = createEffect(() =>
     this.actions$.pipe(
       ofType(VoucherActions.loadVouchersSuccess),

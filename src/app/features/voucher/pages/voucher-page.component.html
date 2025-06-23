@@ -1,6 +1,21 @@
 <div class="container">
   <h1>Voucher Manager</h1>
 
+  <!-- Loading Spinner -->
+  <div *ngIf="loading$ | async" class="loading-overlay">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="success$ | async as successMsg" class="alert alert-success" style="margin-bottom: 1rem;">
+    {{ successMsg }}
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error$ | async as errorMsg" class="alert alert-danger" style="margin-bottom: 1rem;">
+    {{ errorMsg }}
+  </div>
+
   <app-voucher-form
     [voucherToEdit]="selectedVoucher"
     (cancel)="onCancel()"
@@ -69,3 +84,32 @@
     </table>
   </div>
 </div>
+
+<!-- Thêm CSS cho loading overlay nếu muốn -->
+<style>
+.loading-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+}
+.alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+}
+</style>
