@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, Output, ViewChild, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { FormGroup, NgForm } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { Voucher } from 'src/app/features/voucher/voucher.model';
-import { v4 as uuidv4 } from 'uuid';
+import { VoucherFormService } from './voucher-form.service';
 
 @Component({
   selector: 'app-voucher-form',
@@ -19,8 +19,8 @@ export class VoucherFormComponent implements OnDestroy {
   private _voucherToEdit: Voucher | null = null;
   private readonly destroy$ = new Subject<void>();
 
-  constructor(private readonly fb: FormBuilder) {
-    this.form = this.initializeForm();
+  constructor(private formService: VoucherFormService) {
+    this.form = this.formService.initializeForm();
   }
 
   @Input()
@@ -42,7 +42,7 @@ export class VoucherFormComponent implements OnDestroy {
     if (this.isFormValid()) {
       this.isSubmitting = true;
       try {
-        const voucher = this.createVoucherFromForm();
+        const voucher = this.formService.createVoucherFromForm(this.form, this.voucherToEdit);
         this.save.emit(voucher);
         this.clearForm();
       } finally {
@@ -65,42 +65,11 @@ export class VoucherFormComponent implements OnDestroy {
     this.voucherToEdit = null;
   }
 
-  private
-  initializeForm(): FormGroup {
-    return this.fb.group({
-      code: ['', [Validators.required, Validators.minLength(3)]],
-      description: ['', Validators.maxLength(200)],
-      expiryDate: ['', [Validators.required, this.futureDateValidator()]],
-    });
-  }
-
   private handleVoucherChange(): void {
     if (this.voucherToEdit) {
-      this.populateFormWithVoucher();
+      this.formService.populateFormWithVoucher(this.form, this.voucherToEdit);
     } else {
-      this.clearFormData();
-    }
-  }
-
-  private populateFormWithVoucher(): void {
-    if (!this.voucherToEdit) return;
-
-    try {
-      this.form.patchValue({
-        code: this.voucherToEdit.code,
-        description: this.voucherToEdit.description || '',
-        expiryDate: this.parseExpiryDate(this.voucherToEdit.expiryDate),
-      }, { emitEvent: false });
-    } catch (error) {
-      console.error('Error populating form with voucher:', error);
-      this.clearFormData();
-    }
-  }
-
-  private clearFormData(): void {
-    this.form.reset();
-    if (this.formDirective) {
-      this.formDirective.resetForm();
+      this.formService.clearFormData(this.form, this.formDirective);
     }
   }
 
@@ -117,39 +86,5 @@ export class VoucherFormComponent implements OnDestroy {
       const control = this.form.get(key);
       control?.markAsTouched();
     });
-  }
-
-  private createVoucherFromForm(): Voucher {
-    const formValue = this.form.value;
-
-    return {
-      id: this.voucherToEdit?.id || uuidv4(),
-      code: formValue.code.trim(),
-      description: formValue.description?.trim() || '',
-      expiryDate: formValue.expiryDate,
-      status: this.voucherToEdit?.status || 'Available',
-    };
-  }
-
-  private parseExpiryDate(expiryDate: string | Date): Date {
-    if (expiryDate instanceof Date) {
-      return expiryDate;
-    }
-    return new Date(expiryDate);
-  }
-
-  private futureDateValidator() {
-    return (control: any) => {
-      if (!control.value) return null;
-
-      const selectedDate = new Date(control.value);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      if (selectedDate < today) {
-        return { pastDate: true };
-      }
-      return null;
-    };
   }
 }

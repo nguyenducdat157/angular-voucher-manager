@@ -1,0 +1,12 @@
+<h2>Example Page</h2>
+<app-button (click)="logExample()">Log Example</app-button>
+<div>
+  <input appOnlyNumber placeholder="Chỉ nhập số" />
+</div>
+<div>
+  <span>{{ 'angular example' | capitalize }}</span>
+</div>
+<form [formGroup]="emailForm">
+  <input formControlName="email" placeholder="Email" />
+  <div *ngIf="emailForm.get('email')?.hasError('email')">Email không hợp lệ</div>
+</form>

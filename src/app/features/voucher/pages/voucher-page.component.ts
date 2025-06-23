@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { selectAllVouchers, selectVouchersByStatus } from 'src/app/store/voucher/voucher.selectors';
-import * as VoucherActions from 'src/app/store/voucher/voucher.actions';
 import { Voucher } from 'src/app/features/voucher/voucher.model';
+import { VoucherPageService } from './voucher-page.service';
 
 @Component({
   selector: 'app-voucher-page',
@@ -12,52 +10,48 @@ import { Voucher } from 'src/app/features/voucher/voucher.model';
 })
 export class VoucherPageComponent implements OnInit {
   vouchers$: Observable<Voucher[]>;
-  selectedStatus: 'All' | 'Available' | 'Used' | 'Expired' = 'All';
   displayedColumns: string[] = ['code', 'description', 'expiryDate', 'status', 'actions'];
-  selectedVoucher: Voucher | null = null;
+  get selectedStatus() {
+    return this.voucherPageService.selectedStatus;
+  }
+  get selectedVoucher() {
+    return this.voucherPageService.selectedVoucher;
+  }
 
-  constructor(private store: Store) {}
+  constructor(public voucherPageService: VoucherPageService) {}
 
   ngOnInit(): void {
-    this.store.dispatch(VoucherActions.loadVouchers());
+    this.voucherPageService.loadVouchers();
     this.updateVoucherList();
   }
 
   updateVoucherList(): void {
-    if (this.selectedStatus === 'All') {
-      this.vouchers$ = this.store.select(selectAllVouchers);
-    } else {
-      this.vouchers$ = this.store.select(selectVouchersByStatus(this.selectedStatus));
-    }
+    this.vouchers$ = this.voucherPageService.getVouchers$();
   }
 
   onFilterChange(status: 'All' | 'Available' | 'Used' | 'Expired'): void {
-    this.selectedStatus = status;
+    this.voucherPageService.setStatus(status);
     this.updateVoucherList();
   }
 
   markAsUsed(id: string): void {
-    this.store.dispatch(VoucherActions.markAsUsed({ id }));
+    this.voucherPageService.markAsUsed(id);
   }
 
   deleteVoucher(id: string): void {
-    this.store.dispatch(VoucherActions.deleteVoucher({ id }));
+    this.voucherPageService.deleteVoucher(id);
   }
 
   editVoucher(voucher: Voucher): void {
-    this.selectedVoucher = { ...voucher };
+    this.voucherPageService.editVoucher(voucher);
   }
 
   onSaveVoucher(voucher: Voucher): void {
-    if (this.selectedVoucher) {
-      this.store.dispatch(VoucherActions.updateVoucher({ voucher }));
-    } else {
-      this.store.dispatch(VoucherActions.addVoucher({ voucher }));
-    }
-    this.selectedVoucher = null;
+    this.voucherPageService.saveVoucher(voucher);
+    this.updateVoucherList();
   }
 
   onCancel(): void {
-    this.selectedVoucher = null;
+    this.voucherPageService.cancelEdit();
   }
 }
