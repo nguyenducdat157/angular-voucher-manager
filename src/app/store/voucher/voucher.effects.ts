@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { map, mergeMap, catchError, switchMap, tap } from 'rxjs/operators';
+import { map, mergeMap, switchMap } from 'rxjs/operators';
 import * as VoucherActions from './voucher.actions';
 import { VoucherService } from 'src/app/features/voucher/voucher.service';
 import { Store } from '@ngrx/store';
+import * as CommonActions from 'src/app/store/common/common.actions';
 
 @Injectable()
 export class VoucherEffects {
@@ -17,42 +18,21 @@ export class VoucherEffects {
   loadVouchers$ = createEffect(() =>
     this.actions$.pipe(
       ofType(VoucherActions.loadVouchers),
-      switchMap(() => [
-        VoucherActions.setLoading({ loading: true })
-      ])
-    )
-  );
-
-  loadVouchersApi$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(VoucherActions.setLoading),
-      switchMap(() =>
-        this.voucherService.getAll().pipe(
-          map(vouchers => VoucherActions.loadVouchersSuccess({ vouchers })),
-          catchError(error => of(
-            VoucherActions.setError({ error: 'Lỗi tải danh sách voucher!' }),
-            VoucherActions.setLoading({ loading: false })
-          ))
-        )
-      )
+      switchMap(() => this.voucherService.getAll().pipe(
+        map(vouchers => VoucherActions.loadVouchersSuccess({ vouchers }))
+      ))
     )
   );
 
   addVoucher$ = createEffect(() =>
     this.actions$.pipe(
       ofType(VoucherActions.addVoucher),
-      tap(() => this.store.dispatch(VoucherActions.setLoading({ loading: true }))),
       mergeMap(({ voucher }) =>
         this.voucherService.addVoucher(voucher).pipe(
           mergeMap(() => [
-            VoucherActions.setSuccess({ message: 'Thêm voucher thành công!' }),
-            VoucherActions.setLoading({ loading: false }),
+            CommonActions.setSuccess({ message: 'Thêm voucher thành công!' }),
             VoucherActions.loadVouchers()
-          ]),
-          catchError(() => of(
-            VoucherActions.setError({ error: 'Lỗi thêm voucher!' }),
-            VoucherActions.setLoading({ loading: false })
-          ))
+          ])
         )
       )
     )
@@ -61,18 +41,12 @@ export class VoucherEffects {
   updateVoucher$ = createEffect(() =>
     this.actions$.pipe(
       ofType(VoucherActions.updateVoucher),
-      tap(() => this.store.dispatch(VoucherActions.setLoading({ loading: true }))),
       mergeMap(({ voucher }) =>
         this.voucherService.updateVoucher(voucher).pipe(
           mergeMap(() => [
-            VoucherActions.setSuccess({ message: 'Cập nhật voucher thành công!' }),
-            VoucherActions.setLoading({ loading: false }),
+            CommonActions.setSuccess({ message: 'Cập nhật voucher thành công!' }),
             VoucherActions.loadVouchers()
-          ]),
-          catchError(() => of(
-            VoucherActions.setError({ error: 'Lỗi cập nhật voucher!' }),
-            VoucherActions.setLoading({ loading: false })
-          ))
+          ])
         )
       )
     )
@@ -81,18 +55,12 @@ export class VoucherEffects {
   deleteVoucher$ = createEffect(() =>
     this.actions$.pipe(
       ofType(VoucherActions.deleteVoucher),
-      tap(() => this.store.dispatch(VoucherActions.setLoading({ loading: true }))),
       mergeMap(({ id }) =>
         this.voucherService.deleteVoucher(id).pipe(
           mergeMap(() => [
-            VoucherActions.setSuccess({ message: 'Xóa voucher thành công!' }),
-            VoucherActions.setLoading({ loading: false }),
+            CommonActions.setSuccess({ message: 'Xóa voucher thành công!' }),
             VoucherActions.loadVouchers()
-          ]),
-          catchError(() => of(
-            VoucherActions.setError({ error: 'Lỗi xóa voucher!' }),
-            VoucherActions.setLoading({ loading: false })
-          ))
+          ])
         )
       )
     )

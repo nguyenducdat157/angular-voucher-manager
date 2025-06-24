@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { Voucher } from 'src/app/features/voucher/voucher.model';
 import { VoucherPageService } from './voucher-page.service';
 import { Store } from '@ngrx/store';
-import { selectLoading, selectError, selectSuccess } from 'src/app/store/voucher/voucher.selectors';
+import { selectLoading, selectError, selectSuccess } from 'src/app/store/common/common.selectors';
 
 @Component({
   selector: 'app-voucher-page',

@@ -1,8 +1,13 @@
 import { NgModule, Optional, SkipSelf } from '@angular/core';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { LoadingInterceptor } from './interceptors/loading.interceptor';
+import { ErrorInterceptor } from './interceptors/error.interceptor';
 
 @NgModule({
   providers: [
-    // Thêm các service, guard, interceptor toàn cục ở đây
+    // Đăng ký ErrorInterceptor trước, LoadingInterceptor sau
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
   ]
 })
 export class CoreModule {
